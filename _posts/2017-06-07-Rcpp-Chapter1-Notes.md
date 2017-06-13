@@ -15,7 +15,7 @@ R语言是从S语言进化来的，R和S语言近三十年来一直在进化。�
 
 下边是一个例子,数据来自美国黄石公园老忠实喷泉（Old Faithful Geyser）的喷发和等待时间。喷发时间的密度函数曲线见下图。
 
-``` r
+```r
 xx <- faithful$eruptions
 fit <- density(xx)
 plot(fit)
@@ -27,7 +27,7 @@ plot(fit)
 
 接下来展示的代码，说实话没怎么看懂。
 
-``` r
+```r
 xx <- faithful$eruptions
 fit1 <- density(xx)
 fit2 <- replicate(10000,
@@ -48,7 +48,7 @@ lines(fit1)
 
 3-6行执行一个最小型的bootstrap抽样。replicate函数对第二个参数重复了10000次。 第二个参数是一个代码段，包含了2个命令。
 
-``` r
+```r
 x <- sample(xx,replace=TRUE);
 ```
 
@@ -93,7 +93,7 @@ int fibC(const int x) {
 
 上述代码是在R中调用C++代码的一种形式。还有另外一种形式，说实话，没怎么看懂。 对比一下这两个函数的性能，主要是通过**microbenchmark**包来进行。
 
-``` r
+```r
 library(microbenchmark)
 microbenchmark(
   fibR(20),
