@@ -330,3 +330,9 @@ microbenchmark(fibR(20),
     ##     19530   100 a  
     ##   3460513   100 a  
     ##     44470   100 a
+
+## 1.3 第二个例子
+关于两个变量1阶自回归(autogressive process of order one for two variables)的描述,公式符号为$VAR(1)$，表述为：
+$$X_{t}=AX_{t-1}+u_{t}$$
+现在考虑更为一般的形式，p阶$VAR(p)$表述为:
+$$X_{t}=A_{1}X_{t-1}+A_{2}X_{t-2}+...+A_{p}X_{t-p}+u_{t}$$
