@@ -1,0 +1,6 @@
+_site/
+*.swp
+.DS_Store
+Gemfile.lock
+*.bak
+*.Rhistory

@@ -1,0 +1,34 @@
+# ---------------- #
+#   Main Configs   #
+# ---------------- #
+baseurl: 
+url: https://luansheng.github.io
+date_format: "ordinal"
+title: 非淡泊无以明志，非宁静无以致远。三国·蜀·诸葛亮《戒子书》
+author: Zhuang Ma 
+
+# ---------------- #
+#   RSS / Email    #
+# ---------------- #
+subscribe_rss: /feed.xml
+email:
+
+# ---------------- #
+#      Jekyll      #
+# ---------------- #
+markdown: kramdown
+kramdown:
+    input: GFM
+paginate: 9
+permalink: /:year/:month/:day/:title/
+gems:
+    - jekyll-paginate
+    - jekyll-sitemap
+    - jekyll-feed
+    - jemoji
+collections:
+    wiki:
+        output: true
+        permalink: /wiki/:path/
+
+
