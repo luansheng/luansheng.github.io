@@ -15,7 +15,7 @@ R语言是从S语言进化来的，R和S语言近三十年来一直在进化。�
 
 下边是一个例子,数据来自美国黄石公园老忠实喷泉（Old Faithful Geyser）的喷发和等待时间。喷发时间的密度函数曲线见下图。
 
-```r
+``` R
 xx <- faithful$eruptions
 fit <- density(xx)
 plot(fit)
