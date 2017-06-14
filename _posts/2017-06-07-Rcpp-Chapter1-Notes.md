@@ -21,7 +21,7 @@ fit <- density(xx)
 plot(fit)
 ```
 
-![图1 老忠实泉喷发时间密度曲线](/images/2017-06-07-Rcpp-Chapter1-Notes_files/figure-markdown_github/simpleR-1.png)
+![图1 老忠实泉喷发时间密度曲线](/images/2017-06-07-Rcpp-Chapter1-Notes_files/figure-html/simpleR-1.png)
 
 语言完美的展示了R的面向对象特性，利用plot函数，可以直接对函数density的返回结果**fit**进行图形绘制。
 
@@ -44,7 +44,7 @@ polygon(c(fit1$x, rev(fit1$x)),
 lines(fit1)
 ```
 
-![图2 Bootstrap 置信区间](/images/2017-06-07-Rcpp-Chapter1-Notes_files/figure-markdown_github/bootstrap-1.png)
+![图2 Bootstrap 置信区间](/images/2017-06-07-Rcpp-Chapter1-Notes_files/figure-html/bootstrap-1.png)
 
 3-6行执行一个最小型的bootstrap抽样。replicate函数对第二个参数重复了10000次。 第二个参数是一个代码段，包含了2个命令。
 
