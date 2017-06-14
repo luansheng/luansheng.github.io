@@ -1,10 +1,10 @@
--------
+---
 layout: post
 title: Rcpp读书笔记：第二章工具与设置
 categories: Rcpp R
 description: 详细解释Rcpp的编译过程
 keywords: Rcpp, R, 编译, API
-------
+---
 ## 2.1 总体设置
 
 Rcpp提供一个C++应用编程接口（API），来扩展R系统。运行Rcpp和R的一些需求：
