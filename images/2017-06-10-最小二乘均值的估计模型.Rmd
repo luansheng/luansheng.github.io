@@ -1,0 +1,23 @@
+---
+title: "lsmeans"
+author: "Sheng Luan"
+date: "2017年6月14日"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(lsmeans)
+```
+oranges的数据集结构如下：
+
+* 两个品种，对应两个价格（price1和price2）和两个销量（sales1和sales2）；
+* 然后还有store和day两个列变量，分别表示售卖的商店和时间；
+* store和dya两个变量为因子类型，价格为整数类型，销量为数字类型。
+```{r}
+dim(oranges)
+head(oranges)
+str(oranges)
+```
