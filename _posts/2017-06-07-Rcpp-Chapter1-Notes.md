@@ -336,3 +336,61 @@ microbenchmark(fibR(20),
 $$X_{t}=AX_{t-1}+u_{t}$$
 现在考虑更为一般的形式，p阶$VAR(p)$表述为:
 $$X_{t}=A_{1}X_{t-1}+A_{2}X_{t-2}+...+A_{p}X_{t-p}+u_{t}$$
+
+### 1.3.1 R代码
+
+```r
+#定义系数矩阵A和残差矩阵u
+a <- matrix(c(0.5,0.1,0.1,0.5),nrow = 2)
+u <- matrix(rnorm(10000),ncol=2)
+rSim <- function(coeff,errors){
+  simdata <- matrix(0,nrow(errors),ncol(errors))
+  for (row in 2:nrow(errors)) {
+    simdata[row,] = coeff %*% simdata[(row-1),]+errors[row,]
+  }
+  return(simdata)
+}
+rData <- rSim(a,u)
+```
+
+上述代码中，需要说明的是`coeff`是2×2矩阵，而`sima[(row-1),]`为包括2个元素的向量，二者相乘的结果相当于`2×2 %*% 2×1`，结果为`2×1`矩阵。errors[row,]为包括2个元素的向量，跟前边结果相加，相当于`2×1 + 2×1`。结果是一个`2×1`矩阵，但是竟然可以作为一个向量赋值给simdata[row,]。
+
+### 1.3.2 C++代码
+
+本次C++代码用到了另外一个包RcppArmadillo,这个包主要是一个基础的线性代数运算包，包括稠密和稀疏矩阵的四则运算，求逆矩阵等。在本次代码中，主要是用来定义矩阵，以及相关的运算。C++中，矩阵读取的下标是()而不是[]。
+
+
+```r
+suppressMessages(require(inline))
+code <- '
+  arma::mat coeff = Rcpp::as<arma::mat>(a); 
+  arma::mat errors = Rcpp::as<arma::mat>(u);
+  int m = errors.n_rows;
+  int n = errors.n_cols;
+  arma::mat simdata(m,n);
+  simdata.row(0) = arma::zeros<arma::mat>(1,n);
+  for (int row=1; row<m; row++) {
+    simdata.row(row) = simdata.row(row-1)*trans(coeff)+errors.row(row);
+    
+  }
+  return Rcpp::wrap(simdata);
+'
+
+##创建编译函数
+rcppSim <- cxxfunction(signature(a="numeric",u="numeric"),
+                       body=code,
+                       plugin="RcppArmadillo")
+rcppData <- rcppSim(a,u)
+stopifnot(all.equal(rData, rcppData))
+```
+对于`simdata.row(0) = arma::zeros<arma::mat>(1,n)`不是很理解。
+
+### 1.3.3 性能比较
+
+```r
+boxplot(microbenchmark::microbenchmark(rSim(a,u),rcppSim(a,u)))
+```
+
+![boxplot](/images/2017-06-07-Rcpp-Chapter1-Notes_files/figure-html/unnamed-chunk-15-1.png)
+
+rcppSim比rSim大约快了80倍左右。
