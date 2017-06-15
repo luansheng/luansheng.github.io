@@ -127,7 +127,7 @@ $(document).ready(function () {
 <ul>
 <li>两个品种，对应两个价格（price1和price2）和两个销量（sales1和sales2）；</li>
 <li>然后还有store和day两个列变量，分别表示售卖的商店和时间；</li>
-<li>store和dya两个变量为因子类型，价格为整数类型，销量为数字类型。</li>
+<li>store和day两个变量为因子类型，价格为整数类型，销量为数字类型。</li>
 </ul>
 <pre class="r"><code>dim(oranges)</code></pre>
 <pre><code>## [1] 36  6</code></pre>
@@ -147,6 +147,158 @@ $(document).ready(function () {
 ##  $ price2: int  61 37 53 41 41 33 49 53 45 53 ...
 ##  $ sales1: num  11.32 12.92 18.89 14.67 8.65 ...
 ##  $ sales2: num  0.0047 0.0037 7.5429 7.0652 21.2085 ...</code></pre>
+<p>接下来，我们看一下影响品种1销量（Sales1）的主要因素。</p>
+<ul>
+<li>在模型中包括store,day, price1和price2等4个因素。</li>
+<li>其中store和day由于是因子变量，因此作为固定效应；price1和price2作为协变量。</li>
+<li>这里把price2纳入模型，是因为品种2的价格也会影响品种1的销量。</li>
+</ul>
+<pre class="r"><code>oranges.lm1 &lt;- lm(sales1 ~ price1 + price2 + store + day , data = oranges)
+anova(oranges.lm1)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: sales1
+##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
+## price1     1 516.59  516.59 29.0996 1.763e-05 ***
+## price2     1  62.73   62.73  3.5334  0.072873 .  
+## store      5 212.95   42.59  2.3991  0.068548 .  
+## day        5 433.10   86.62  4.8793  0.003456 ** 
+## Residuals 23 408.31   17.75                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>其中<code>lm()</code>函数为R自带的函数，包括在stats包中。<code>anova()</code>给出了方差分析表。</p>
+<p>从表中可以看出，price2对sales1的影响未达到显著水平。</p>
+<p>lsmeans包中的<code>ref.grid()</code>可以用来建立参考表格，代码如下：</p>
+<pre class="r"><code>oranges.rg1 &lt;- ref.grid(oranges.lm1)
+oranges.rg1</code></pre>
+<pre><code>## 'ref.grid' object with variables:
+##     price1 = 51.222
+##     price2 = 48.556
+##     store = 1, 2, 3, 4, 5, 6
+##     day = 1, 2, 3, 4, 5, 6</code></pre>
+<p>从上边结果中可以看出，两个价格协变量price1和price2用它们的均值作为参考水平。</p>
+<p>两个因子用它们各自的6个水平作为参考水平。因此参考表格共计包括<span class="math inline">\(1×1×6×6=36\)</span>个水平组合。</p>
+<p>LS means基于参考表格的预测值进行计算。参考表格的预测值可以通过<code>summary()</code>或者<code>predict()</code>获得。</p>
+<pre class="r"><code>oranges.rg1.prediction &lt;- summary(oranges.rg1)
+oranges.rg1.prediction</code></pre>
+<pre><code>##    price1   price2 store day prediction       SE df
+##  51.22222 48.55556 1     1     2.918413 2.717559 23
+##  51.22222 48.55556 2     1     4.961475 2.377742 23
+##  51.22222 48.55556 3     1     3.200891 2.377742 23
+##  51.22222 48.55556 4     1     6.198757 2.363673 23
+##  51.22222 48.55556 5     1     5.543218 2.363116 23
+##  51.22222 48.55556 6     1    10.563739 2.366683 23
+##  51.22222 48.55556 1     2     3.848804 2.701335 23
+##  51.22222 48.55556 2     2     5.891866 2.335579 23
+##  51.22222 48.55556 3     2     4.131282 2.335579 23
+##  51.22222 48.55556 4     2     7.129148 2.352186 23
+##  51.22222 48.55556 5     2     6.473609 2.330670 23
+##  51.22222 48.55556 6     2    11.494130 2.339254 23
+##  51.22222 48.55556 1     3    11.018569 2.534556 23
+##  51.22222 48.55556 2     3    13.061630 2.416451 23
+##  51.22222 48.55556 3     3    11.301047 2.416451 23
+##  51.22222 48.55556 4     3    14.298913 2.431679 23
+##  51.22222 48.55556 5     3    13.643374 2.363673 23
+##  51.22222 48.55556 6     3    18.663895 2.347839 23
+##  51.22222 48.55556 1     4     6.096286 2.651370 23
+##  51.22222 48.55556 2     4     8.139348 2.352186 23
+##  51.22222 48.55556 3     4     6.378765 2.352186 23
+##  51.22222 48.55556 4     4     9.376630 2.388653 23
+##  51.22222 48.55556 5     4     8.721091 2.337599 23
+##  51.22222 48.55556 6     4    13.741613 2.341304 23
+##  51.22222 48.55556 1     5    12.795800 2.444597 23
+##  51.22222 48.55556 2     5    14.838862 2.466155 23
+##  51.22222 48.55556 3     5    13.078278 2.466155 23
+##  51.22222 48.55556 4     5    16.076144 2.519089 23
+##  51.22222 48.55556 5     5    15.420605 2.395544 23
+##  51.22222 48.55556 6     5    20.441126 2.370343 23
+##  51.22222 48.55556 1     6     8.748779 2.786176 23
+##  51.22222 48.55556 2     6    10.791841 2.337599 23
+##  51.22222 48.55556 3     6     9.031258 2.337599 23
+##  51.22222 48.55556 4     6    12.029123 2.364688 23
+##  51.22222 48.55556 5     6    11.373584 2.352318 23
+##  51.22222 48.55556 6     6    16.394106 2.370539 23</code></pre>
+<p>有了基于参考表格的预测值后，通过lsmeans包中的<code>lsmeans()</code>函数可以直接获得某一个因子各水平的最小二乘均值。</p>
+<pre class="r"><code>lsmeans(oranges.rg1,&quot;day&quot;)</code></pre>
+<pre><code>##  day    lsmean       SE df  lower.CL  upper.CL
+##  1    5.564415 1.768083 23  1.906856  9.221974
+##  2    6.494807 1.728959 23  2.918183 10.071430
+##  3   13.664571 1.751505 23 10.041308 17.287835
+##  4    8.742289 1.733920 23  5.155403 12.329175
+##  5   15.441803 1.785809 23 11.747576 19.136029
+##  6   11.394782 1.766726 23  7.740031 15.049533
+## 
+## Results are averaged over the levels of: store 
+## Confidence level used: 0.95</code></pre>
+<p>上面结果，给出了每一天品种1销量(<strong>Sales1</strong>)的最小二乘均值。</p>
+<p>可以从看出，周三、周五的销量最高，周六次之。</p>
+<p>上述结果实际上是对oranges.rg1.prediction预测数据集，按照day不同水平进行均值汇总输出的结果。</p>
+<p>利用dplyr包相关函数手动计算day六个水平的最小二乘均值：</p>
+<pre class="r"><code>suppressMessages(require(dplyr))
+oranges.rg1.day.lsmeans &lt;- oranges.rg1.prediction %&gt;% 
+  group_by(day) %&gt;% 
+  summarise(lsmean=mean(prediction))
+oranges.rg1.day.lsmeans</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##      day    lsmean
+##   &lt;fctr&gt;     &lt;dbl&gt;
+## 1      1  5.564415
+## 2      2  6.494807
+## 3      3 13.664571
+## 4      4  8.742289
+## 5      5 15.441803
+## 6      6 11.394782</code></pre>
+<p>进一步利用ASReml-R中的相关函数，计算day六个水平的最小二乘均值，相互验证。</p>
+<pre class="r"><code>suppressMessages(require(asreml))</code></pre>
+<pre><code>## Licensed to: YSFRI
+## Serial Number: 402568129 Expires: 30-nov-2018 (533 days)</code></pre>
+<pre class="r"><code>oranges.asreml &lt;-
+  asreml(
+    fixed = sales1 ~ -1+store + day + price1 + price2 ,
+    rcov = ~ units,
+    family = asreml.gaussian(),
+    data = oranges,
+    maxiter = 100
+  )</code></pre>
+<pre><code>## ASReml: Thu Jun 15 12:34:50 2017
+## 
+##      LogLik         S2      DF      wall     cpu
+##     -60.6324     17.7525    23  12:34:50     0.0
+##     -60.6324     17.7525    23  12:34:50     0.0
+## 
+## Finished on: Thu Jun 15 12:34:50 2017
+##  
+## LogLikelihood Converged</code></pre>
+<pre class="r"><code>oranges.asreml.lsmeans &lt;- predict(oranges.asreml,classify = &quot;day&quot;)</code></pre>
+<pre><code>## ASReml: Thu Jun 15 12:34:53 2017
+## 
+##      LogLik         S2      DF      wall     cpu
+##     -60.6324     17.7525    23  12:34:53     0.0
+##     -60.6324     17.7525    23  12:34:53     0.0
+## 
+## Finished on: Thu Jun 15 12:34:53 2017
+##  
+## LogLikelihood Converged</code></pre>
+<pre class="r"><code>oranges.asreml.lsmeans$predictions$pvals</code></pre>
+<pre><code>## 
+## Notes:
+## - The predictions are obtained by averaging across the hypertable
+##   calculated from model terms constructed solely from factors in
+##   the averaging and classify sets.
+## - Use &quot;average&quot; to move ignored factors into the averaging set.
+## 
+## - price1 evaluated at average value of 51.222222
+## - price2 evaluated at average value of 48.555556
+## - The SIMPLE averaging set:  store 
+## 
+##   day predicted.value standard.error est.status
+## 1   1        5.564415       1.768083  Estimable
+## 2   2        6.494807       1.728959  Estimable
+## 3   3       13.664571       1.751505  Estimable
+## 4   4        8.742289       1.733920  Estimable
+## 5   5       15.441803       1.785808  Estimable
+## 6   6       11.394782       1.766726  Estimable</code></pre>
+<p>从结果来看，利用lsmeans，手动汇总和asreml给出的结果都是一致的。上述结果有助于加深对于LS means的理解。</p>
 
 
 

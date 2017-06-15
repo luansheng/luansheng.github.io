@@ -15,9 +15,73 @@ oranges的数据集结构如下：
 
 * 两个品种，对应两个价格（price1和price2）和两个销量（sales1和sales2）；
 * 然后还有store和day两个列变量，分别表示售卖的商店和时间；
-* store和dya两个变量为因子类型，价格为整数类型，销量为数字类型。
+* store和day两个变量为因子类型，价格为整数类型，销量为数字类型。
 ```{r}
 dim(oranges)
 head(oranges)
 str(oranges)
 ```
+接下来，我们看一下影响品种1销量（Sales1）的主要因素。
+
+* 在模型中包括store,day, price1和price2等4个因素。
+* 其中store和day由于是因子变量，因此作为固定效应；price1和price2作为协变量。
+* 这里把price2纳入模型，是因为品种2的价格也会影响品种1的销量。
+```{r}
+oranges.lm1 <- lm(sales1 ~ price1 + price2 + store + day , data = oranges)
+anova(oranges.lm1)
+```
+其中`lm()`函数为R自带的函数，包括在stats包中。`anova()`给出了方差分析表。
+
+从表中可以看出，price2对sales1的影响未达到显著水平。
+
+lsmeans包中的`ref.grid()`可以用来建立参考表格，代码如下：
+```{r}
+oranges.rg1 <- ref.grid(oranges.lm1)
+oranges.rg1
+```
+
+从上边结果中可以看出，两个价格协变量price1和price2用它们的均值作为参考水平。
+
+两个因子用它们各自的6个水平作为参考水平。因此参考表格共计包括$1×1×6×6=36$个水平组合。
+
+LS means基于参考表格的预测值进行计算。参考表格的预测值可以通过`summary()`或者`predict()`获得。
+```{r}
+oranges.rg1.prediction <- summary(oranges.rg1)
+oranges.rg1.prediction
+```
+
+有了基于参考表格的预测值后，通过lsmeans包中的`lsmeans()`函数可以直接获得某一个因子各水平的最小二乘均值。
+```{r}
+lsmeans(oranges.rg1,"day")
+```
+
+上面结果，给出了每一天品种1销量(**Sales1**)的最小二乘均值。
+
+可以从看出，周三、周五的销量最高，周六次之。
+
+上述结果实际上是对oranges.rg1.prediction预测数据集，按照day不同水平进行均值汇总输出的结果。
+
+利用dplyr包相关函数手动计算day六个水平的最小二乘均值：
+```{r}
+suppressMessages(require(dplyr))
+oranges.rg1.day.lsmeans <- oranges.rg1.prediction %>% 
+  group_by(day) %>% 
+  summarise(lsmean=mean(prediction))
+oranges.rg1.day.lsmeans
+```
+进一步利用ASReml-R中的相关函数，计算day六个水平的最小二乘均值，相互验证。
+
+```{r}
+suppressMessages(require(asreml))
+oranges.asreml <-
+  asreml(
+    fixed = sales1 ~ -1+store + day + price1 + price2 ,
+    rcov = ~ units,
+    family = asreml.gaussian(),
+    data = oranges,
+    maxiter = 100
+  )
+oranges.asreml.lsmeans <- predict(oranges.asreml,classify = "day")
+oranges.asreml.lsmeans$predictions$pvals
+```
+从结果来看，利用lsmeans，手动汇总和asreml给出的结果都是一致的。上述结果有助于加深对于LS means的理解。
