@@ -8,13 +8,13 @@ keywords: github, first blog
 
 这是我的第一个blog，架构在github上，基于jekyll。
 
-关于数学公式的支持问题，从网上到的答案多是这样：
-```    
-    <script type="text/javascript"
-    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
+关于数学公式的支持问题，对于本博客是在_includes/header.html文件中加入下列语句：
+``` javascript   
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 ```
-但是从github的说明上来看，由于github使用的是[kramdown](ttps://help.github.com/articles/updating-your-markdown-processor-to-kramdown/)作为markdown的解析器,而kramdown是支持[公式展示](https://kramdown.gettalong.org/syntax.html#math-blocks)的。具体方法为：
+github使用的是[kramdown](ttps://help.github.com/articles/updating-your-markdown-processor-to-kramdown/)作为markdown的解析器,而kramdown是支持[公式展示](https://kramdown.gettalong.org/syntax.html#math-blocks)的。具体方法为：
 
 ```Latex
 $$
