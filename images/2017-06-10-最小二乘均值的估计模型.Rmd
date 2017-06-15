@@ -85,3 +85,13 @@ oranges.asreml.lsmeans <- predict(oranges.asreml,classify = "day")
 oranges.asreml.lsmeans$predictions$pvals
 ```
 从结果来看，利用lsmeans，手动汇总和asreml给出的结果都是一致的。上述结果有助于加深对于LS means的理解。
+
+### 1.2.3 调整参考表格
+在计算LS means的时候，可以考虑设置协变量的值，以及要预测的因子的水平。  
+譬如，我们可以设置在price1=50，price2=40以及price2=60水平上，只预测2,3,4三天的最小二乘均值。
+```{r}
+org.lsm <- lsmeans(oranges.lm1,"day",by="price2",at=list(price1=50,price2=c(40,60),day=c("2","3","4")))
+org.lsm
+
+```
+
