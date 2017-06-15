@@ -16,7 +16,7 @@ keywords: github, first blog
 ```
 github使用的是[kramdown](ttps://help.github.com/articles/updating-your-markdown-processor-to-kramdown/)作为markdown的解析器,而kramdown是支持[公式展示](https://kramdown.gettalong.org/syntax.html#math-blocks)的。具体方法为：
 
-```Latex
+``` Latex
 $$
 \begin{align*}
   & \phi(x,y) = \phi \left(\sum_{i=1}^n x_ie_i, \sum_{j=1}^n y_je_j \right)
