@@ -42,7 +42,7 @@ and Computing, Springer, Heidelberg, ISBN 978-0-387-75935-7
 Rcpp本质上是建立在R API基础上的一个补充的接口，可以更好的扩展R。利用C++程序，生成更多可供R调用的工具，来提高R编程的效率。
 
 ## 2.4 Rcpp的首次编译
-将下列C++代码存为fibnacii.cpp文件。
+将下列C++代码存为fibonacii.cpp文件。
 ```cpp
 #include <Rcpp.h>
 int fibonacci(const int x) {
@@ -59,9 +59,9 @@ extern "C" SEXP fibWrapper(SEXP xs) {
 ```
 如何编译上述代码？需要进行以下几项准备工作（本文主要针对windows 10系统下）：
 
-* 首先R CMD命令要可以运行。安装最新的[Rtools](https://cran.r-project.org/bin/windows/Rtools/)。安装完成后，设置环境变量，在path中添加R主程序所在的路径，本文中用的是R3.4可执行文件所在的路径，本文所用路径为：C:\Program Files\R\R-3.4.0patched\bin。添加完成后，Win+R，输入cmd，然后在命令行中输入path，查看是否添加成功。
+* 首先R CMD命令要可以运行。安装最新的[Rtools](https://cran.r-project.org/bin/windows/Rtools/)。安装完成后，设置环境变量，在path中添加R主程序所在的路径，本文中用的是R3.4可执行文件所在的路径，本文所用路径为：`C:\Program Files\R\R-3.4.0patched\bin`。添加完成后，Win+R，输入cmd，然后在命令行中输入path，查看是否添加成功。
 * 查找Rcpp包所在的路径，本文Rcpp包所在路径为`C:/Users/luan_/Documents/R/win-library/3.4/Rcpp/`。
-* 注意windows输出的路径是"\"需要替换为"/"。
+* 注意windows输出的路径是"\\"需要替换为"/"。
 
 完成上述两项工作后，win+R，输入cmd，通过cd命令切换到fibonacci.cpp文件所在的路径，在窗口中输入下边的命令：
 ```
