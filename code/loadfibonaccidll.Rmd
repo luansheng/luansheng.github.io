@@ -1,0 +1,27 @@
+---
+title: "Untitled"
+author: "Sheng Luan"
+date: "2017年6月16日"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(Rcpp)
+setwd("C:/Users/luan_/luansheng/luansheng.github.io/code")
+dyn.load("fibonacci.dll")
+.Call("fibWrapper",10)
+```
+
+```{r}
+.Library
+```
+```{r}
+.libPaths()
+```
+
