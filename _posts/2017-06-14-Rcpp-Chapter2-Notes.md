@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Rcpp读书笔记：第二章工具与设置
-categories: Rcpp R
+categories: Rcpp R C++
 description: 详细解释Rcpp的编译过程
 keywords: Rcpp, R, 编译, API
 ---
