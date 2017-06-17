@@ -66,7 +66,7 @@ $$
 ```
 <a id="1">1</a> Searle SR, Speed FM, Milliken GA (1980). Population marginal means in the linear model: A alternative to least squares means. The American Statistician, 34(4), 216-221.
 
-### 3.关于git的一些小问题（windows系统）
+### 3. 关于git的一些小问题（windows系统）
 git现在的版本默认使用的是utf-8编码，但是在git log git status时，中文文件名会显示乱码。解决方案：
 在git bash中输入下列命令：
 
