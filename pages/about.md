@@ -8,7 +8,8 @@ permalink: /about/
 
 **Professor at [YSFRI](http://www.ysfri.ac.cn)**
 
-Qingdao City, China \| Selective breeding for shrimp and fish  
+Qingdao City, China \| Selective breeding for shrimp and fish
+
 My research is on the areas of shrimp and fish selective breeding. I am interested in design of genetic improvement programs, development of breeding objectives, selection strategies, and genetic evaluation systems. Currently, my research is focused on estimating genetic parameters for additive, non-additive and indirect genetic effects, predicting selection response, and designing mating scheme for economically important traits in shrimp and fish.
   
 *Education:* Ocean University of China
