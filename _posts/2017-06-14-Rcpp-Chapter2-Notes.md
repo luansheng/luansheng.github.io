@@ -128,4 +128,8 @@ PKG_CXXFLAGS=`Rscript -e 'Rcpp:::CxxFlags()'` \
 PKG_LIBS=`Rscript -e 'Rcpp:::LdFlags()'` \
 R CMD SHLIB fibonacci.cpp
 ```
+## 2.5 inline 包
+现在再理解起来，比第一章要容易的多了。inline包适合快速开发，因为C++代码可以直接在R代码中书写，直接与R代码一起运行，C++代码的编译、链接和载入在后台进行，特别方便。
 
+inline提供函数`cfunction()`和`cxxfunction()`，在R会话中直接编译、链接和加载C++函数。
+在`cxxfunction()`函数中,可以设置plugin参数，用来指定头文件和库位置，在本文中，一般会指定为Rcpp。因此，为了简化使用，inline提供一个cxx`function()`的替代函数`rcpp()`,默认plugin为rcpp。
