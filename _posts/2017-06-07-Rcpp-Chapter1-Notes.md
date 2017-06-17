@@ -87,7 +87,7 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 int fibC(const int x) {
     if (x == 0 || x == 1) return(x);
-    return (fibC(x - 1)) + fibC(x - 2);
+    return (fibC(x - 1) + fibC(x - 2));
 }
 ```
 
@@ -119,7 +119,7 @@ microbenchmark(
 int fibonacci(const int x) {
   if (x == 0) return(0);
   if (x == 1) return(1);
-  return (fibonacci(x - 1)) + fibonacci(x - 2);
+  return (fibonacci(x - 1) + fibonacci(x - 2));
 }
 
 extern "C" SEXP fibWrapper(SEXP xs) {
@@ -128,7 +128,9 @@ extern "C" SEXP fibWrapper(SEXP xs) {
   return (Rcpp::wrap(fib));
 }
 ```
-接下来的工作，是要把这两个函数进行编译、链接成一个共享库（shared library)，目的是为了让R可以载入。这三步，事实上每一步都非常复杂，而且耗时费力。引入**inline**包，来简化完成这项工作。
+接下来的工作，是要把这两个函数进行编译、链接成一个共享库（shared library)，目的是为了让R可以载入。这三步，事实上每一步都非常复杂，而且耗时费力。
+具体如何做，在第二章[Rcpp首次编译](https://luansheng.github.io/2017/06/14/Rcpp-Chapter2-Notes/)部分进行了详细阐述。参见链接。
+引入**inline**包，来简化完成这项工作。
 
 ### 1.2.5 Fibonacii的可理解和可执行版本
 
