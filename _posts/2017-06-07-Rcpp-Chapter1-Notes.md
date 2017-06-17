@@ -78,7 +78,7 @@ fibR <- function(n) {
 
 ### 1.2.3 Fibonacci的C++版本
 
-令人惊喜的是，可以在Rcmd中调用Rcpp执行C++代码。通过在chunk头中定义`engine="Rcpp"`或者直接用`{Rcpp}`表示。
+令人惊喜的是，可以在Rmd中直接编译、链接和执行C++代码。通过在chunk头中定义`engine="Rcpp"`或者直接用`{Rcpp}`表示。
 
 ``` cpp
 #include <Rcpp.h>
@@ -91,7 +91,8 @@ int fibC(const int x) {
 }
 ```
 
-上述代码是在R中调用C++代码的一种形式。还有另外一种形式，说实话，没怎么看懂。 对比一下这两个函数的性能，主要是通过**microbenchmark**包来进行。
+上述代码是在R中调用C++代码的一种形式。  
+对比一下这两个函数的性能，主要是通过**microbenchmark**包来进行。
 
 ```r
 library(microbenchmark)
@@ -113,7 +114,7 @@ microbenchmark(
 
 ### 1.2.4 Fibonacii的原始调用C++版本
 
-难以理解的调用C++的一个写法，用到了Rcpp的两个关键函数*as*和*wrap*.其中as的作用是把SEXP类型的xs变量转换为 C++需要的int类型。SEXP是S expression type的缩写，int是integer的缩写。相反，wrap的作用是把int类型的fib变量转换为R需要的SEXP类型。
+这是调用C++的原始写法，用到了Rcpp的两个关键函数*as*和*wrap*。其中as的作用是把SEXP类型的xs变量转换为 C++需要的int类型。SEXP是S expression type的缩写，int是integer的缩写。相反，wrap的作用是把int类型的fib变量转换为R需要的SEXP类型。
 
 ``` cpp
 int fibonacci(const int x) {
@@ -128,9 +129,9 @@ extern "C" SEXP fibWrapper(SEXP xs) {
   return (Rcpp::wrap(fib));
 }
 ```
-接下来的工作，是要把这两个函数进行编译、链接成一个共享库（shared library)，目的是为了让R可以载入。这三步，事实上每一步都非常复杂，而且耗时费力。
-具体如何做，在第二章[Rcpp首次编译](https://luansheng.github.io/2017/06/14/Rcpp-Chapter2-Notes/)部分进行了详细阐述。参见链接。
-引入**inline**包，来简化完成这项工作。
+接下来的工作，是要把这两个函数进行编译、链接成一个共享库（shared library)，然后在R中载入共享库。这三步，事实上每一步都非常复杂，而且耗时费力。
+具体如何做，在第二章中[Rcpp的首次编译](https://luansheng.github.io/2017/06/14/Rcpp-Chapter2-Notes/)部分进行了详细阐述，参见链接。
+为了简化上述工作，引入**inline**包，。
 
 ### 1.2.5 Fibonacii的可理解和可执行版本
 
