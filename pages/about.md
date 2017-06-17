@@ -8,7 +8,7 @@ permalink: /about/
 
 ![about](/images/about.jpg)
 
-**Professor at [YSFRI](http://www.ysfri.ac.cn)**
+**[Professor](http://www.ysfri.ac.cn/laboratory-menber-detail.aspx?did=170&id=106) at [YSFRI](http://www.ysfri.ac.cn)**
 
 Qingdao City, China \| Selective breeding for shrimp and fish
 
