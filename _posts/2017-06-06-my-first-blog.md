@@ -7,7 +7,7 @@ keywords: github, first blog
 ---
 
 这是我的第一个blog，架构在github上，基于jekyll。
-
+### 1. 数学公式
 关于数学公式的支持问题，对于本博客是在_includes/header.html文件中加入下列语句：
 ``` javascript   
 <script type="text/javascript"
@@ -50,3 +50,18 @@ $$
     \end{array} \right)
 \end{align*}
 $$
+
+### 2. 页内跳转
+找了好久，都没有找到如何页内跳转。github page使用如下方法是可行的
+
+点击会跳转,括号里边#后边的"1"表示要跳转的链接的ID
+```markdown
+[Searle](#1)1980
+```
+[Searle](#1)1980
+
+定义跳转的目的地，与前边的"1"对应，也称锚点（anchor）
+```markdown
+<a id="1">1</a> Searle SR, Speed FM, Milliken GA (1980). Population marginal means in the linear model: A alternative to least squares means. The American Statistician, 34(4), 216-221.
+```
+<a id="1">1</a> Searle SR, Speed FM, Milliken GA (1980). Population marginal means in the linear model: A alternative to least squares means. The American Statistician, 34(4), 216-221.
