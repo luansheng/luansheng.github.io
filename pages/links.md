@@ -17,3 +17,7 @@ permalink: /links/
 <ul>
 <li><a href="http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000">廖雪峰Git教程</a></li>
 </ul>
+
+<ul>
+<li><a href="http://www.cnblogs.com/maowang1991/p/3371640.html">vim复制粘贴命令</a></li>
+</ul>
