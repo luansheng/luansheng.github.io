@@ -7,6 +7,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(Rcpp)
+library(inline)
 ```
 
 ## 2.1 总体设置
@@ -47,4 +49,66 @@ Rcpp本质上是建立在R API基础上的一个补充的接口，可以更好�
 
 ## 2.4 Rcpp的首次编译
 
+## 2.5 inline
+卷积好像是一种预测，对不停的信号输入，可以预测其输出。知乎上有个以复利进行解释的的例子，比较容易的理解。https://www.zhihu.com/question/22298352
+```{r}
+##定义C++代码
+src <- '
+Rcpp::NumericVector xa(a);
+Rcpp::NumericVector xb(b);
+int n_xa =xa.size(), n_xb = xb.size();
 
+Rcpp::NumericVector xab(n_xa + n_xb-1);
+for (int i=0; i < n_xa; i++)
+  for (int j=0; j < n_xb; j++)
+    xab[i+j] += xa[i] * xb[j];
+return xab;
+'
+
+###定义在R中调用的接口函数
+fun <- cxxfunction(signature(a="numeric",b="numeric"),
+src,plugin="Rcpp")
+
+#利用rcpp函数定义接口函数
+funrcpp <-  rcpp(signature(a="numerci",b="numeric"),src)
+
+##记得加载Rcpp和inline两个包，不然会找不到Rcpp调用的类型和函数
+require(Rcpp)
+require(inline)
+fun(1:4,2:5)
+funrcpp(1:4,2:5)
+```
+
+函数中添加**`verbose=TRUE`**参数可以显示`cxxfunction()`生成的临时文件和R CMD SHLIB触发的调用。
+```{r}
+funverbose <- cxxfunction(signature(a="numeric",b="numeric"),
+src,plugin="Rcpp",verbose = TRUE)
+```
+从显示的文件中，可以看出，`cxxfunciton()`函数实际上在内部生成一个随机函数，并且进行了声明和定义。
+声明部分,其中对a和b两个变量定义为SEXP类型。
+```cpp
+// declarations                          
+extern "C" {                             
+SEXP file9864474b192a( SEXP a, SEXP b) ; 
+}                                        
+```
+定义部分，`BEGIN_RCPP`和`END_RCPP`两个宏的作用，还不知道。书中说后续会解释。
+```cpp
+// definition                               
+                                            
+SEXP file9864474b192a( SEXP a, SEXP b ){    
+BEGIN_RCPP                                  
+                                            
+Rcpp::NumericVector xa(a);                  
+Rcpp::NumericVector xb(b);                  
+int n_xa =xa.size(), n_xb = xb.size();      
+                                            
+Rcpp::NumericVector xab(n_xa + n_xb-1);     
+for (int i=0; i < n_xa; i++)                
+  for (int j=0; j < n_xb; j++)              
+    xab[i+j] += xa[i] * xb[j];              
+return xab;                                 
+                                            
+END_RCPP                                    
+}                                           
+```
