@@ -82,7 +82,7 @@ funrcpp(1:4,2:5)
 ## [1]  2  7 16 30 34 31 20
 ```
 
-函数中添加`verbose=TRUE`参数可以显示`cxxfunction()`生成的临时文件和R CMD SHLIB触发的调用。
+函数中添加**`verbose=TRUE`**参数可以显示`cxxfunction()`生成的临时文件和R CMD SHLIB触发的调用。
 
 ```r
 funverbose <- cxxfunction(signature(a="numeric",b="numeric"),
@@ -120,12 +120,12 @@ src,plugin="Rcpp",verbose = TRUE)
 ##   20 : 
 ##   21 : // declarations
 ##   22 : extern "C" {
-##   23 : SEXP file9864474b192a( SEXP a, SEXP b) ;
+##   23 : SEXP file9eec3f1e11be( SEXP a, SEXP b) ;
 ##   24 : }
 ##   25 : 
 ##   26 : // definition
 ##   27 : 
-##   28 : SEXP file9864474b192a( SEXP a, SEXP b ){
+##   28 : SEXP file9eec3f1e11be( SEXP a, SEXP b ){
 ##   29 : BEGIN_RCPP
 ##   30 : 
 ##   31 : Rcpp::NumericVector xa(a);
@@ -143,6 +143,33 @@ src,plugin="Rcpp",verbose = TRUE)
 ##   43 : 
 ##   44 : 
 ## Compilation argument:
-##  C:/PROGRA~1/R/R-34~1.0PA/bin/x64/R CMD SHLIB file9864474b192a.cpp 2> file9864474b192a.cpp.err.txt
+##  C:/PROGRA~1/R/R-34~1.0PA/bin/x64/R CMD SHLIB file9eec3f1e11be.cpp 2> file9eec3f1e11be.cpp.err.txt
 ```
-
+从显示的文件中，可以看出，`cxxfunciton()`函数实际上在内部生成一个随机函数，并且进行了声明和定义。
+声明部分,其中对a和b两个变量定义为SEXP类型。
+```cpp
+// declarations                          
+extern "C" {                             
+SEXP file9864474b192a( SEXP a, SEXP b) ; 
+}                                        
+```
+定义部分，`BEGIN_RCPP`和`END_RCPP`两个宏的作用，还不知道。书中说后续会解释。
+```cpp
+// definition                               
+                                            
+SEXP file9864474b192a( SEXP a, SEXP b ){    
+BEGIN_RCPP                                  
+                                            
+Rcpp::NumericVector xa(a);                  
+Rcpp::NumericVector xb(b);                  
+int n_xa =xa.size(), n_xb = xb.size();      
+                                            
+Rcpp::NumericVector xab(n_xa + n_xb-1);     
+for (int i=0; i < n_xa; i++)                
+  for (int j=0; j < n_xb; j++)              
+    xab[i+j] += xa[i] * xb[j];              
+return xab;                                 
+                                            
+END_RCPP                                    
+}                                           
+```

@@ -189,7 +189,7 @@ fun(1:4,2:5)</code></pre>
 <pre><code>## [1]  2  7 16 30 34 31 20</code></pre>
 <pre class="r"><code>funrcpp(1:4,2:5)</code></pre>
 <pre><code>## [1]  2  7 16 30 34 31 20</code></pre>
-<p>函数中添加<code>verbose=TRUE</code>参数可以显示<code>cxxfunction()</code>生成的临时文件和R CMD SHLIB触发的调用。</p>
+<p>函数中添加<strong><code>verbose=TRUE</code></strong>参数可以显示<code>cxxfunction()</code>生成的临时文件和R CMD SHLIB触发的调用。</p>
 <pre class="r"><code>funverbose &lt;- cxxfunction(signature(a=&quot;numeric&quot;,b=&quot;numeric&quot;),
 src,plugin=&quot;Rcpp&quot;,verbose = TRUE)</code></pre>
 <pre><code>##  &gt;&gt; setting environment variables: 
@@ -222,12 +222,12 @@ src,plugin=&quot;Rcpp&quot;,verbose = TRUE)</code></pre>
 ##   20 : 
 ##   21 : // declarations
 ##   22 : extern &quot;C&quot; {
-##   23 : SEXP file9864474b192a( SEXP a, SEXP b) ;
+##   23 : SEXP file9eec3f1e11be( SEXP a, SEXP b) ;
 ##   24 : }
 ##   25 : 
 ##   26 : // definition
 ##   27 : 
-##   28 : SEXP file9864474b192a( SEXP a, SEXP b ){
+##   28 : SEXP file9eec3f1e11be( SEXP a, SEXP b ){
 ##   29 : BEGIN_RCPP
 ##   30 : 
 ##   31 : Rcpp::NumericVector xa(a);
@@ -245,7 +245,30 @@ src,plugin=&quot;Rcpp&quot;,verbose = TRUE)</code></pre>
 ##   43 : 
 ##   44 : 
 ## Compilation argument:
-##  C:/PROGRA~1/R/R-34~1.0PA/bin/x64/R CMD SHLIB file9864474b192a.cpp 2&gt; file9864474b192a.cpp.err.txt</code></pre>
+##  C:/PROGRA~1/R/R-34~1.0PA/bin/x64/R CMD SHLIB file9eec3f1e11be.cpp 2&gt; file9eec3f1e11be.cpp.err.txt</code></pre>
+<p>从显示的文件中，可以看出，<code>cxxfunciton()</code>函数实际上在内部生成一个随机函数，并且进行了声明和定义。 声明部分,其中对a和b两个变量定义为SEXP类型。</p>
+<pre class="cpp"><code>// declarations                          
+extern &quot;C&quot; {                             
+SEXP file9864474b192a( SEXP a, SEXP b) ; 
+}                                        </code></pre>
+<p>定义部分，<code>BEGIN_RCPP</code>和<code>END_RCPP</code>两个宏的作用，还不知道。书中说后续会解释。</p>
+<pre class="cpp"><code>// definition                               
+                                            
+SEXP file9864474b192a( SEXP a, SEXP b ){    
+BEGIN_RCPP                                  
+                                            
+Rcpp::NumericVector xa(a);                  
+Rcpp::NumericVector xb(b);                  
+int n_xa =xa.size(), n_xb = xb.size();      
+                                            
+Rcpp::NumericVector xab(n_xa + n_xb-1);     
+for (int i=0; i &lt; n_xa; i++)                
+  for (int j=0; j &lt; n_xb; j++)              
+    xab[i+j] += xa[i] * xb[j];              
+return xab;                                 
+                                            
+END_RCPP                                    
+}                                           </code></pre>
 </div>
 
 
