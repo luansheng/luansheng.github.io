@@ -1,0 +1,54 @@
+---
+title: "Untitled"
+author: "Sheng Luan"
+date: "2017年7月11日"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(data.table)
+flights <- fread("flights14.csv")
+flights.copy <- copy(flights)
+```
+* data.table的特点：**减小计算复杂度**，降低**计算时间**。  
+
+# 1.主键
+
+利用主键进行subset，速度会更加快。
+## 1.1 设置主键
+通过函数`setkey()`来设置主键。下边代码将origin列设置为主键。
+```{r}
+setkey(flights,origin)
+setkey(flights,"origin")
+head(flights)
+```
+origin列设置为主键后，一个明显特征，其中的元素从小到大排序了。
+列被setkey后，速度提升很快。利用microbenchmark包进行测试。设置为主键后，的确快一些。
+```{r}
+require(microbenchmark)
+microbenchmark(flights[.("JFK")],flights.copy[origin == "JFK"])
+```
+
+* 因为已经将主键设置为 origin列了，所以只要直接指定"JFK"就可以了。这里 .()用来在data.table的主键（也就是flights 的 origin列）里，查找"JFK"。
+* 首先，满足"JFK"条件的行的索引都被获取到。然后，这些行的哪些信息是必要的呢。既然参数j里没有指定任何表达式，这些行的所有列都被返回了。
+* 如果主键是字符型的列，那么可以省略 .()，就像用行名subset一个data.frame的行的时候。
+flights["JFK"]              ## same as flights[.("JFK")]
+
+* 我们可以根据需要指定多个值
+flights[c("JFK", "LGA")]    ## same as flights[.(c("JFK", "LGA"))]
+这返回所有 origin列是“JFK” 或者 “LGA”的所有行。
+```{r}
+flights[c("JFK", "LGA")]
+flights[.(c("JFK", "LGA"))]
+```
+使用函数 `key()`,获得被设置为主键的列名 
+```{r}
+key(flights)
+key(flights.copy)
+```
+
+* 函数 key() 返回主键列名的字符型向量。
+* 如果data.table没有设置过主键，返回 NULL。
