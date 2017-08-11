@@ -189,11 +189,66 @@ var(\hat{a}_{i}) = var(by) = var(h_{2}y) \\
 <h2>1.3.2 重复记录</h2>
 <p>个体的多次测定记录，如奶牛在哺乳期的多次产奶量，其均值可以用来预测个体的育种值。对于个体的多次测定记录，通常会存在如下假定：由于受到环境因子或者永久影响个体多次测定记录的环境的影响，多次测定记录间会存在更多的相似性（additional resemblance）。换句话说（in other words），受非遗传永久环境效应的影响，个体的多次测定记录间存在额外的协方差。</p>
 <p>个体间的方差可以进一步剖分为部分遗传的和部分环境的方差（永久环境效应，permanent environmental effect）；个体内的方差组分，是由对个体进行多次测量时的临时环境差异引起的。因此，观测值的方差可以进一步剖分为：</p>
+<p>公式1.9</p>
 <p><span class="math display">\[var(y) = var(g) + var(pe) + var(te)\]</span></p>
 <p>其中<span class="math display">\[var(g)\]</span>是加性和非加性遗传方差；<span class="math display">\[var(pe)\]</span>是由永久环境效应产生的方差；<span class="math display">\[var(te)\]</span>是由随机的(random) 临时的 (temporary) 环境效应引起的方差。</p>
-<p>组内相关（<strong>组内个体间的相关</strong>），值得是个体间相关方差与表型方差的比例(the ratio of between-individual variance to phenotypic variance)</p>
+<p>组内相关（<strong>组内个体间的相关</strong>），指的是个体间方差与表型方差的比例(the ratio of between-individual variance to phenotypic variance)</p>
+<p>公式1.10</p>
 <p><span class="math display">\[t=(var(g)+var(pe))/var(y)\]</span></p>
 <p>t通常称之为重复力，用来测量个体记录间的相关。</p>
+<p>从公式1.10也可以反推出</p>
+<p>公式1.11</p>
+<p><span class="math display">\[var(te)/var(y) = 1-t\]</span></p>
+<p>对于公式1.10 ，通常会假设重复记录是来自同一个性状，也就是说任何成对记录间的遗传相关应该是1（<strong>不是太理解</strong>）。另外一个假设是：所有的测定记录，具有相同的方差。并且所有成对记录的环境相关是相同的。设定<span class="math display">\[\tilde{y}\]</span>表示个体i的n个记录的均值。个体i的育种值可以通过公式1.12进行预测：</p>
+<p>公式1.12</p>
+<p><span class="math display">\[\hat{a}_{i} = b(\tilde{y}_{i}-\mu)\]</span></p>
+<p>对上述公式进行推导：</p>
+<p>公式1.13</p>
+<p><span class="math display">\[b = cov(a,\tilde{y})/var(\tilde{y})\]</span></p>
+<p>体重a指的是真实育种值。进一步分解<span class="math display">\[cov(a,\tilde{y})\]</span>:</p>
+<p>公式1.14</p>
+<p><span class="math display">\[cov(a,\tilde{y}) = cov(a,g + pe + \sum{te}/n) = \sigma^{2}_{a}\]</span></p>
+<p>之所以能够推导出上述公式，是因为a与pe、te之间不存在相关性，所以他们的协方差为零。</p>
+<p>公式1.15</p>
+<p><span class="math display">\[var(\tilde{y}) = var(g) + var(pe) +var(te)/n\]</span></p>
+<p>对于<span class="math display">\[var(\tilde{y})\]</span>，不同于<span class="math display">\[var(y)\]</span>,最后te的方差需要除以n。</p>
+<p>根据公式1.10 和公式1.11可以对公式1.15进一步变换：</p>
+<p>公式1.16（注意，原书中这个地方写错了，写成var(t)了）</p>
+<p><span class="math display">\[var(\tilde{y}) = var(g) + var(pe) + (1-t)\frac{var(y)}{n} \\
+= var(y)t + (1-t)\frac{var(y)}{n} \\
+=var(y)(t + \frac{1-t}{n}) \\
+=\sigma^{2}_{y}(t + \frac{1-t}{n})
+\]</span></p>
+<p>根据公式1.16，那么公式1.13可以进一步简化为：</p>
+<p>公式1.17</p>
+<p><span class="math display">\[
+b = cov(a,\tilde{y})/var(\tilde{y}) \\
+= \frac{\sigma^{2}_{a}}{\sigma^{2}_{y}(t + \frac{1-t}{n})} \\
+= \frac{\sigma^{2}_{a}}{\sigma^{2}_{y}}\frac{1}{t + \frac{1-t}{n}} \\
+= h^{2}\frac{1}{\frac{nt+1-t}{n}} \\
+= h^{2}\frac{1}{\frac{1+(n-1)t}{n}} \\
+= h^{2}n\frac{1}{1+(n-1)t} \\
+= \frac{nh^{2}}{1+(n-1)t} \\
+\]</span></p>
+<p>公式可以看出b由<strong>遗传力、重复力和记录的重复测量次数</strong>决定。从公式1.12中，可以推出，也意味着育种值由上述三个参数决定。</p>
+<p>就像前边提到的，假定个体重复记录的差别是由于测量连续性能（successive performance）时的现场环境差异（temporary environment）造成的。如果清楚那些影响性能的因子，会对连续记录产生影响，那么必须要进行校正。</p>
+<p>譬如，第一次和第二次哺乳期（lactation）产仔（calving）时的母牛年龄，会影响两次哺乳期的产奶量 （milk yield）。因此应用两次哺乳期产奶量均值，预测育种值时，必须要对这种年龄差异进行矫正。</p>
+<p>育种值的准确性用公式（1.18）表述为：</p>
+<p>公式1.18 （基于公式1.16和1.17）</p>
+<p><span class="math display">\[r_{a,y} = \frac{cov(a,\tilde{y})}{\sigma_{a}\sigma_{\tilde{y}}} \\
+= \frac{\sigma^{2}_{a}}{\sigma_{a}\sqrt{\sigma^{2}_{y}(t + \frac{1-t}{n})}} \\
+= \frac{\sigma_{a}}{\sqrt{\sigma^{2}_{y}(t + \frac{1-t}{n})}} \\
+= \frac{\sigma_{a}}{\sigma_{y}\sqrt{t + \frac{1-t}{n}}} \\
+= \frac{h}{\sqrt{t + \frac{1-t}{n}}} \\
+= h\sqrt{\frac{n}{nt +1-t}} \\
+= \sqrt{\frac{nh^{2}}{1+(n-1)t}} \\
+= \sqrt{b}
+\]</span></p>
+<p>与单性状的记录相比，多次记录其育种值估计的准确度更好，受重复力和测定记录次数影响。譬如假定<span class="math display">\[h^{2}\]</span>=0.3, t=0.5，当n=2,3,…,10时，育种值估计的准确度分别为</p>
+<p><span class="math display">\[r_{a,y} = \sqrt{\frac{nh^{2}}{1+(n-1)t}} \\
+= \sqrt{\frac{2*0.3}{1+(2-1)*0.5}} \\
+=
+\]</span> 0.6324555</p>
 </div>
 </div>
 
