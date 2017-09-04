@@ -425,7 +425,11 @@ DT[[&quot;v&quot;]] #提取v列更快的方式</code></pre>
 ## 8: c 3 8
 ## 9: c 6 9</code></pre>
 <pre class="r"><code>X = data.table(x=c(&quot;c&quot;,&quot;b&quot;),v=8:7,foo=c(4,2)) #X作为拟要合并的数据集
-X[DT,on=&quot;x&quot;] #以DT数据集中x列为主，筛选与之匹配的X中的行，left join</code></pre>
+X</code></pre>
+<pre><code>##    x v foo
+## 1: c 8   4
+## 2: b 7   2</code></pre>
+<pre class="r"><code>X[DT,on=&quot;x&quot;] #以DT数据集中x列为主，筛选与之匹配的X中的行，left join</code></pre>
 <pre><code>##    x  v foo y i.v
 ## 1: b  7   2 1   1
 ## 2: b  7   2 3   2

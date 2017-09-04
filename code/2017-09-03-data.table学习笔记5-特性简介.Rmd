@@ -107,6 +107,7 @@ DT[c("b","c"),sum(v),by=.EACHI,on=.(x)]
 ```{r}
 DT #原始数据集
 X = data.table(x=c("c","b"),v=8:7,foo=c(4,2)) #X作为拟要合并的数据集
+X
 X[DT,on="x"] #以DT数据集中x列为主，筛选与之匹配的X中的行，left join
 DT[X,on="x"] #以X数据集中x列为主，筛选与之匹配的DT行 right join
 DT[X,on="x",nomatch=0] #返回双方共有的行 inner join
