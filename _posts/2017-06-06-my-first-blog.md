@@ -8,7 +8,13 @@ keywords: github, first blog
 
 这是我的第一个blog，架构在github上，基于jekyll。
 ### 1. 数学公式
-关于数学公式的支持问题，对于本博客是在_includes/header.html文件中加入下列语句：
+关于数学公式的支持问题，对于本博客是在_includes/header.html文件中<head>块内加入下列语句：
+``` javascript
+<script type="text/javascript" async
+   src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+```
+请注意，下边的链接不再起作用。具体参见说明：http://docs.mathjax.org/en/latest/start.html
 ``` javascript   
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
