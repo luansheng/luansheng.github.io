@@ -117,6 +117,99 @@ D(\varepsilon) =
 \end{bmatrix}
 $$
 
+* 原始变量协方差结构的分解
 
+$$
+X - \mu =  AF + \varepsilon
+$$
 
+$$
+Var(X-\mu) = AVar(F)A + Var(\varepsilon) \\
+Var(X) = AVar(F)A + Var(\varepsilon)
+$$
 
+上边这个公式非常重要，它表明X的协方差矩阵可以表示用公共因子方差矩阵、载荷系数矩阵和特殊因子矩阵进行表示。这几个矩阵的维度比X的协方差矩阵都要低很多。
+
+## 1.4 XFA (eXtended Factor Analysis model)
+
+XFA实际上是因子分析的一种扩展形式，参见[ASReml的说明文档](https://www.vsni.co.uk/software/asreml/htmlhelp/asreml/facanal.htm)：
+
+譬如xfa1(4)表示，原始变量有4个，公共因子只有1个，载荷系数矩阵为4*1，特殊因子为4*1。
+当时给ASReml作者Arthur Gilmour的邮件中也是这么理解的：
+
+Now I have known some about XFA and what you have write.
+XFA1 means that we only use the 1 common factor. I also know the number of parameters will be 8 (the first four values are for special or residual variance, the last four values are the coefficient for 1th common factor ) if I have 4 variables.  
+
+在ASReml中定义方差结构时，如果需要提供先验值，以XFA1(4)为例，那么顺序是：4个特殊因子方差值；然后是载荷系数矩阵第1列（4个数，只有1列），如果是xfa2(4)，那么这里会有8个数（因为有2列）。
+
+以直接DGE和间接遗传效应IGE方差组分为例，如果有高（HD）和低（LD）2个密度，那么会存在四个变量：LD.DGE、LD.IGE HD.DGE HD.IGE，在ASReml中可以这样定义：
+
+`str(Dens.AnimalID $Mates Zero.Animal xfa1(4).nrm(AnimalID))`
+
+其中`Mates`表示为(实际上是2个密度的IGE)：
+
+```
+!ASSIGN Mates Dens.Mate1 and(Dens.Mate2) and(Dens.Mate3) and(Dens.Mate4) and(Dens.Mate5) and(Dens.Mate6) and(Dens.Mate7) and(Dens.Mate8) and(Dens.Mate9) and(Dens.Mate10) and(Dens.Mate11) and(Dens.Mate12) and(Dens.Mate13) and(Dens.Mate14) and(Dens.Mate15) and(Dens.Mate16) and(Dens.Mate17) and(Dens.Mate18) and(Dens.Mate19) and(Dens.Mate20) and(Dens.Mate21) and(Dens.Mate22) and(Dens.Mate23) and(Dens.Mate24) and(Dens.Mate25) and(Dens.Mate26) and(Dens.Mate27) and(Dens.Mate28) and(Dens.Mate29) and(Dens.Mate30) and(Dens.Mate31) and(Dens.Mate32) and(Dens.Mate33) and(Dens.Mate34) and(Dens.Mate35) and(Dens.Mate36) and(Dens.Mate37) and(Dens.Mate38) and(Dens.Mate39) and(Dens.Mate40) and(Dens.Mate41) and(Dens.Mate42) and(Dens.Mate43) and(Dens.Mate44) and(Dens.Mate45)
+```
+
+其中Zero.Animal的意思，咨询ASReml的作者Arthur Gilmour：
+
+只是说The design matrix for an XFA terms needs extra empty columns to fit the FACTOR.
+
+ASReml给出的一个结果：
+
+```
+ 4                      XFA_V  0  1  0.257662      0.257662       0.43   0 P
+ 4                      XFA_V  0  2   0.00000       0.00000       0.00   0 F
+ 4                      XFA_V  0  3   0.00000       0.00000       0.00   0 F
+ 4                      XFA_V  0  4  0.676462E-03  0.676462E-03   0.70   0 P
+ 4                      XFA_L  1  1 -0.650819     -0.650819      -1.80   0 P
+ 4                      XFA_L  1  2  0.894162      0.894162       4.18   0 P
+ 4                      XFA_L  1  3  0.468200E-01  0.468200E-01   1.88   0 P
+ 4                      XFA_L  1  4 -0.126477E-01 -0.126477E-01  -0.90   0 P
+ ```
+ 
+ 前边四个值是特殊因子方差，接下来四个值是因子载荷矩阵第1列的四个值。
+ 
+ASReml提供了从xfa到us结构的转换方法（在VPREDICT部分）：
+
+```
+VPREDICT !DEFINE
+V Gen xfa1(4).nrm(AnimalID) 
+```
+
+转换为us结构后的结果(10个参数，4*4下三角)：
+
+```
+ AnimalID               NRM   13176
+  13 Gen                      0.68124       0.42820        
+  14 Gen                     -0.58188       0.33805        
+  15 Gen                      0.79961       0.44647        
+  16 Gen                     -0.30467E-01   0.28622E-01    
+  17 Gen                      0.41867E-01   0.27579E-01
+  18 Gen                      0.21921E-02   0.24696E-02
+  19 Gen                      0.82304E-02   0.11226E-01
+  20 Gen                     -0.11310E-01   0.14198E-01
+  21 Gen                     -0.59218E-03   0.78588E-03
+  22 Gen                      0.83648E-03   0.10994E-02
+  
+```
+
+类似于这样,对角线为各自方差组分，其他为协方差。
+
+```
+          LD.DGE          HD.DGE          LD.IGE             HD.IGE
+ LD.DGE   0.68124
+ HD.DGE   -0.58188        0.79961
+ LD.IGE   -0.30467E-01    0.41867E-01     0.21921E-02        
+ HD.IGE   0.82304E-02     -0.11310E-01    -0.59218E-03       0.83648E-03
+ 
+ ```
+ 
+## todo
+
+ * 因子载荷矩阵，需要详细了解。以及在ASRreml中为什么需要zero。
+ * 关于XFA，在Linear Models for the Prediction of Animal Breeding Values(3nd version)中，有讨论，可以深入看一下。
+ 
+ 
+        
