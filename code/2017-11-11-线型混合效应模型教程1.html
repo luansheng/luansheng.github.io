@@ -189,7 +189,8 @@ shrimp.sex.m2bw</code></pre>
 <h3>4.1 简单线性模型</h3>
 <p><code>lm()</code>是R自带的函数。<code>summary()</code>函数输出shrimp.lm的结果。</p>
 <pre class="r"><code>shrimp.lm &lt;- lm(M2BW~SexID,shrimp)
-summary(shrimp.lm)</code></pre>
+shrimp.lm.sum &lt;- summary(shrimp.lm)
+shrimp.lm.sum</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = M2BW ~ SexID, data = shrimp)
@@ -208,9 +209,14 @@ summary(shrimp.lm)</code></pre>
 ## Residual standard error: 4.591 on 4280 degrees of freedom
 ## Multiple R-squared:  0.3105, Adjusted R-squared:  0.3104 
 ## F-statistic:  1928 on 1 and 4280 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>现在解释上边的结果。首先来看<code>Multiple R-squared:  0.3105</code>，它表示模型对总体方差的解释能力。具体意思可以解释为，总体方差中的31%，可以由这个模型来解释。<code>Adjusted R-squared</code>是对<code>Multiple R-squared</code>的矫正，主要是考虑了固定效应。固定效应越多，该值越低。</p>
-<p>下一个概念是非常的重要，那就是p值。P值是否小于0.05或者0.001，已经成为文章结果是否可靠，是否能够发表的一个重要标志。但是，p值一定程度上就像SCI论文的影响因子，有点滥用的味道。</p>
-<p>我们还本溯源，本质上p值是一个条件概率，它表示<strong>无效假设为真时的概率</strong>。那什么是无效假设呢？在上文中，无效假设是<strong>“对于体重性状，雌雄虾间没有差异”</strong>，也就是说雌雄虾体重是相等的。在本文中，p值小于0.001，意味着如果”雌雄间没有差异，那么数据基本上不可能是这样“，因为<strong>雌雄间没有差异</strong>的概率太低！这反过来表明，性别影响了对虾的体重，雌雄虾体重是有差别的，也就是说统计上是显著的。</p>
+<p>现在解释上边的结果。首先来看<code>Multiple R-squared:</code> 0.3105178，它表示模型对总体方差的解释能力。具体意思可以解释为，总体方差中的31.05%，可以由这个模型来解释。<code>Adjusted R-squared</code>是对<code>Multiple R-squared</code>的矫正，主要是考虑了固定效应。固定效应越多，该值越低。</p>
+<p>下一个概念是非常的重要，那就是p值。P值是否小于0.05或者0.001，已经成为文章结果是否可靠，是否能够发表的一个重要标志。但是，p值一定程度上就像SCI论文的影响因子，有点滥用的味道。Nature上关于p值的故事:<a href="http://blog.sciencenet.cn/blog-265205-771680.html">中文版本</a>；<a href="http://www.nature.com/news/scientific-method-statistical-errors-1.14700">英文版本</a>。</p>
+<p>我们还本溯源，本质上p值是一个条件概率，它表示<strong>无效假设为真时的概率</strong>。那什么是无效假设呢？在上文中，无效假设是<strong>“对于体重性状，雌雄虾间没有差异”</strong>，也就是说雌雄虾体重是相等的。在本文中，p值为&lt;0.001 ，意味着如果”雌雄间没有差异，那么数据基本上不可能是这样“，因为<strong>雌雄间没有差异</strong>的概率太低！这反过来表明，性别影响了对虾的体重，雌雄虾体重是有差别的，也就是说统计上是显著的。</p>
+<p>需要注意的另外一个问题是，模型所有效应的显著性（最底部）与系数列表单个效应的显著性还是存在差别的。上文中，两个结果是一致的，主要是因为模型中只包括1个固定效应。如果有更多效应，这两个值就不再相等。</p>
+<p>F值是我们应该关注的另外一个参数，表示模型是否显著的一个重要参数。F值可以简单理解为处理方差与误差方差的比值，譬如在上文中，可以理解为性别间体重方差与残差方差的比值，这个值越大，那么表示雌雄间体重差异越大。需要注意，在上文中F值是1928，与两个自由度有关系（性别2-1；误差4281-1）。</p>
+<p>接下来重点讨论系数列表。你会看到SexIDMale，你可能会问，SexID有两个水平，Female去哪里了？Estimates这一列表示的固定效应值到底是什么意思？</p>
+<p>首先看一下系数列表中的(Intercept) 项，估计值是33.9399 ，是不是感觉很熟悉？它是Female体重的均值。在本文前边我们估计了雌雄体重的均值。</p>
+<p>再看一下SexIDMale的估计值，是-6.1655。Intercept估计值+SexIDMale估计值=雄虾体重值27.77。为什么要用雌虾体重值作为截距？为什么雄虾体重固定效应估计值要表示为与截距，也就是雌虾体重值的差值？</p>
 </div>
 </div>
 
