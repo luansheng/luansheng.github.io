@@ -35,7 +35,7 @@ if (window.hljs) {
   hljs.configure({languages: []});
   hljs.initHighlightingOnLoad();
   if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlightingOnLoad(); }, 0);
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
   }
 }
 </script>
@@ -172,9 +172,11 @@ shrimp.sex.m2bw</code></pre>
 </div>
 <div class="section level2">
 <h2>3 线性混合效应模型简介</h2>
-<p><span class="math display">\[M2BW = Sex + \varepsilon\]</span> 表示一尾虾的体重由性别和随机误差决定。其中<span class="math display">\[Sex\]</span>作为固定效应，<span class="math display">\[\varepsilon\]</span>作为随机效应。后者表示所有影响体重的不可测量的效应总和，是随机和不可控制的。</p>
+<p><span class="math display">\[M2BW = Sex + \varepsilon\]</span></p>
+<p>表示一尾虾的体重由性别和随机误差决定。其中<span class="math display">\[Sex\]</span>作为固定效应，<span class="math display">\[\varepsilon\]</span>作为随机效应。后者表示所有影响体重的不可测量的效应总和，是随机和不可控制的。</p>
 <p>从数据中我们发现，一尾虾的体重还受它所在的测试池和所在家系的影响。因此，这两个效应也需要放到模型中。模型进一步变为：</p>
-<p><span class="math display">\[M2BW = Sex + Tank + Family +\varepsilon\]</span> 新加入的两个变量，Tank和Family，如果都作为固定效应。那么上述模型称为线性模型。如果Family作为随机效应，那么上述模型称为线性混合效应模型（固定效应+随机效应）。</p>
+<p><span class="math display">\[M2BW = Sex + Tank + Family +\varepsilon\]</span></p>
+<p>新加入的两个变量，Tank和Family，如果都作为固定效应。那么上述模型称为线性模型。如果Family作为随机效应，那么上述模型称为线性混合效应模型（固定效应+随机效应）。</p>
 <p>这里碰到的一个棘手问题是，模型中一个效应到底是作为固定效应，还是随机效应？准确的说，应该是与研究目的相关。</p>
 <p>SAS for Mixed models (Second edition) 手册中对固定效应的定义为：“An effect is called fixed if the levels in the study represent all possible levels of the factor, or at least all levels about which inference is to be made”。可简单地理解为“该效应的所有水平在实验群体中都已经出现”。譬如在本数据集中，性别只有雌、雄两个水平，因此模型中性别一般作为固定效应。再比如，测试投喂5种饲料对对虾体重的影响。由于目的很明确，只是评估这5种饲料的差异，因此饲料应作为固定效应。</p>
 <p>随机效应的定义为：“Factor effects are random if they are used in the study to represent only a sample (ideally, a random sample) of a larger set of potential levels”。可简单地理解为“试验群体出现的该效应的水平只是一个很大水平数中的随机抽样。</p>
@@ -207,7 +209,8 @@ summary(shrimp.lm)</code></pre>
 ## Multiple R-squared:  0.3105, Adjusted R-squared:  0.3104 
 ## F-statistic:  1928 on 1 and 4280 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>现在解释上边的结果。首先来看<code>Multiple R-squared:  0.3105</code>，它表示模型对总体方差的解释能力。具体意思可以解释为，总体方差中的31%，可以由这个模型来解释。<code>Adjusted R-squared</code>是对<code>Multiple R-squared</code>的矫正，主要是考虑了固定效应。固定效应越多，该值越低。</p>
-<p>下一个概念是非常的重要，那就是P值。</p>
+<p>下一个概念是非常的重要，那就是p值。P值是否小于0.05或者0.001，已经成为文章结果是否可靠，是否能够发表的一个重要标志。但是，p值一定程度上就像SCI论文的影响因子，有点滥用的味道。</p>
+<p>我们还本溯源，本质上p值是一个条件概率，它表示<strong>无效假设为真时的概率</strong>。那什么是无效假设呢？在上文中，无效假设是<strong>“对于体重性状，雌雄虾间没有差异”</strong>，也就是说雌雄虾体重是相等的。在本文中，p值小于0.001，意味着如果”雌雄间没有差异，那么数据基本上不可能是这样“，因为<strong>雌雄间没有差异</strong>的概率太低！这反过来表明，性别影响了对虾的体重，雌雄虾体重是有差别的，也就是说统计上是显著的。</p>
 </div>
 </div>
 
