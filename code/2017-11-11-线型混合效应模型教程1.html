@@ -35,7 +35,7 @@ if (window.hljs) {
   hljs.configure({languages: []});
   hljs.initHighlightingOnLoad();
   if (document.readyState && document.readyState === "complete") {
-    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+    window.setTimeout(function() { hljs.initHighlightingOnLoad(); }, 0);
   }
 }
 </script>
@@ -172,9 +172,13 @@ shrimp.sex.m2bw</code></pre>
 </div>
 <div class="section level2">
 <h2>3 线性混合效应模型简介</h2>
+<p><a id="1">模型1</a></p>
 <p><span class="math display">\[M2BW = Sex + \varepsilon\]</span></p>
 <p>表示一尾虾的体重由性别和随机误差决定。其中<span class="math display">\[Sex\]</span>作为固定效应，<span class="math display">\[\varepsilon\]</span>作为随机效应。后者表示所有影响体重的不可测量的效应总和，是随机和不可控制的。</p>
 <p>从数据中我们发现，一尾虾的体重还受它所在的测试池和所在家系的影响。因此，这两个效应也需要放到模型中。模型进一步变为：</p>
+<p><a id="2">模型2</a></p>
+<p><span class="math display">\[M2BW = Sex + Tank +\varepsilon\]</span></p>
+<p><a id="3">模型3</a></p>
 <p><span class="math display">\[M2BW = Sex + Tank + Family +\varepsilon\]</span></p>
 <p>新加入的两个变量，Tank和Family，如果都作为固定效应。那么上述模型称为线性模型。如果Family作为随机效应，那么上述模型称为线性混合效应模型（固定效应+随机效应）。</p>
 <p>这里碰到的一个棘手问题是，模型中一个效应到底是作为固定效应，还是随机效应？准确的说，应该是与研究目的相关。</p>
@@ -216,7 +220,84 @@ shrimp.lm.sum</code></pre>
 <p>F值是我们应该关注的另外一个参数，表示模型是否显著的一个重要参数。F值可以简单理解为处理方差与误差方差的比值，譬如在上文中，可以理解为性别间体重方差与残差方差的比值，这个值越大，那么表示雌雄间体重差异越大。需要注意，在上文中F值是1928，与两个自由度有关系（性别2-1；误差4281-1）。</p>
 <p>接下来重点讨论系数列表。你会看到SexIDMale，你可能会问，SexID有两个水平，Female去哪里了？Estimates这一列表示的固定效应值到底是什么意思？</p>
 <p>首先看一下系数列表中的(Intercept) 项，估计值是33.9399 ，是不是感觉很熟悉？它是Female体重的均值。在本文前边我们估计了雌雄体重的均值。</p>
-<p>再看一下SexIDMale的估计值，是-6.1655。Intercept估计值+SexIDMale估计值=雄虾体重值27.77。为什么要用雌虾体重值作为截距？为什么雄虾体重固定效应估计值要表示为与截距，也就是雌虾体重值的差值？</p>
+<p>再看一下SexIDMale的估计值，是-6.1655。Intercept估计值+SexIDMale估计值=雄虾体重值27.77。为什么要用雌虾体重值作为截距？为什么雄虾体重固定效应估计值要表示为与截距，也就是雌虾体重值的差值？这里没有雌虾固定效应，可以认为是0。</p>
+<p>第一个问题，之所以选择雌虾而不是雄虾作为截距，只是因为Female和Male这两个水平Female根据字母排序在Male前边。</p>
+<p>第二个问题，之所以把雄虾体重固定效应值表示为与截距之差，是为了与协变量等统一起来。为了解释，大家先看图。</p>
+<pre class="r"><code>sex.bw &lt;- shrimp[,mean(M2BW,na.rm=TRUE),by=.(SexID)]
+
+ggplot(data=shrimp,aes(x=SexID,y=M2BW,color=SexID))+
+  geom_dotplot(binaxis = &quot;y&quot;,stackdir = &quot;center&quot;,position = &quot;dodge&quot;,binwidth = 0.25)+
+  geom_vline(xintercept = 1)+
+  geom_vline(xintercept = 2)+
+  geom_hline(yintercept = 33.93992)+
+  geom_hline(yintercept = 27.77438)+
+  geom_abline(intercept = 40.75,slope=-6.6155)+
+  geom_text(x=2.4,y=31.5,label=&quot;-6.6155&quot;)+
+  annotate(&quot;segment&quot;,x=2.5,xend=2.5,y=27.77438,yend = 33.93992)</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>因为Female和Male均为因子变量，因此在x轴上可以将Female标准化为0，Male与Female的间距为1，二者体重差值为-6.6155，那么斜线的斜率可以认为等于-6.6155。这样就可以很方便的求解或者说预测体重。</p>
+<p>我们可以根据<a href="#1">模型1</a>，预测雌雄虾体重：</p>
+<p>我们随机选取一尾虾，如果是雄虾，那么斜率为-6.1655，雄虾的预测体重为：</p>
+<p><span class="math display">\[
+BW = 群体均值 + 雄虾的固定效应 \\
+   = 33.9399 + -6.1655*1 \\
+   = 27.7744
+\]</span></p>
+<p>我们随机选取一尾虾，如果是雌虾，因为截距本身设置为雌虾体重均值，因此斜率为0 <span class="math display">\[
+BW = 群体均值 + 雌虾的固定效应 \\
+   = 33.9399 + 0*1 \\
+   = 33.9399
+\]</span></p>
+<p>我们继续来看一个稍微复杂的例子，在模型中加入TankID效应</p>
+<pre class="r"><code>shrimp.lm.sex.tank &lt;- lm(M2BW~SexID+TankID,shrimp)
+shrimp.lm.sex.tank.sum &lt;- summary(shrimp.lm.sex.tank)
+shrimp.lm.sex.tank.sum</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = M2BW ~ SexID + TankID, data = shrimp)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -21.0480  -2.7480   0.0735   2.8520  15.0520 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  35.4265     0.1135  312.14   &lt;2e-16 ***
+## SexIDMale    -6.1600     0.1329  -46.37   &lt;2e-16 ***
+## TankIDT2     -2.9786     0.1328  -22.44   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 4.344 on 4279 degrees of freedom
+## Multiple R-squared:  0.3831, Adjusted R-squared:  0.3828 
+## F-statistic:  1329 on 2 and 4279 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>从上边模型中可以看出，截距是35.4265。我们把数据汇总一下：</p>
+<pre class="r"><code>shrimp[,mean(M2BW,na.rm=TRUE),by=.(SexID,TankID)]</code></pre>
+<pre><code>##     SexID TankID       V1
+## 1:   Male     T1 29.25391
+## 2: Female     T1 35.43819
+## 3:   Male     T2 26.30058
+## 4: Female     T2 32.43625</code></pre>
+<p>我们发现，模型实际上是把Female.T1这个组合均值设置为截距（群体均值）。Male到Female.T1的斜率为-6.16，T2到Female.T1的斜率为-2.9786；同理，Female到Female.T1的斜率为0，T1到Female.T1的斜率也为0。</p>
+<p>那么，根据<a href="#2">模型2</a>,可以预测雌雄虾体重：</p>
+<p>如果随机从T1池捞取一尾雄虾，它的预测体重为：</p>
+<p><span class="math display">\[
+BW = 群体均值 + 雄虾的固定效应 + T1池固定效应 \\
+   = 35.4265 + -6.16*1 + 0*1 \\
+   = 29.26
+\]</span> 这个数值跟Male.T1的值29.25非常接近。</p>
+<p>如果随机从T2池捞取一尾雄虾，它的预测体重为 <span class="math display">\[
+BW = 群体均值 + 雄虾的固定效应 + T2池固定效应 \\
+   = 35.4265 + -6.1600*1 + -2.9786*1 \\
+   = 26.2879
+\]</span></p>
+<p>这个数值跟Male.T2的均值26.30非常接近。</p>
+<p>如果随机从T2池捞取一尾雌虾，它的预测体重为 <span class="math display">\[
+BW = 群体均值 + 雌虾的固定效应 + T2池固定效应 \\
+   = 35.4265 + 0*1 + -2.9786*1 \\
+   = 32.44
+\]</span></p>
+<p>这个数值跟Female.T2的均值32.436非常接近。</p>
 </div>
 </div>
 
