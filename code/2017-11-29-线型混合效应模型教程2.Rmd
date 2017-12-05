@@ -1,0 +1,75 @@
+---
+title: "线性混合效应模型教程1"
+author: "Sheng Luan"
+date: "2017年11月19日"
+output: 
+  html_document: 
+    keep_md: yes
+  html_notebook: 
+    fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(ggplot2)
+require(data.table)
+require(lme4)
+require(sjPlot)
+```
+
+[上接线性混合效应模型教程1](https://luansheng.github.io/2017/11/19/%E7%BA%BF%E6%80%A7%E6%B7%B7%E5%90%88%E6%95%88%E5%BA%94%E6%A8%A1%E5%9E%8B%E6%95%99%E7%A8%8B1/)
+
+### 4.4 包括随机效应的线性混合效应模型
+
+shrimp数据集中有一个PopID字段，包括Pop1到Pop4共计4个水平，表示shrimp数据由四个群体组成。现在考虑这样一个问题：四个群体间收获体重是否存在差异。
+
+首先加载数据文件。画出四个群体收获体重的箱形图，加上jitter点。
+```{r}
+shrimp <- fread(input = "shrimp.csv",sep = ",",header = TRUE,stringsAsFactors = TRUE)
+str(shrimp)
+
+ggplot(data=shrimp,aes(x=PopID,y=M2BW,color=PopID)) + 
+  geom_boxplot(outlier.size = 0)+
+  geom_jitter(alpha=0.3)+
+  labs(x="群体",y="收获体重")+
+  theme_gray(base_size = 20)+
+  theme(legend.position = "none")
+```
+
+进一步分析，你会发现每个群体由多个家系组成。这里需要重点讨论一个问题，为什么我们在评价群体间的差异时，需要考虑每个群体内的家系结构？
+
+理论上，我们从每个群体抽样时，抽样个体是代表该群体的随机样本。但是，一个群体内的个体往往存在亲缘关系，譬如（全同胞、半同胞个体）。因此抽样个体存在两个层次：每个群体包括多个家系，每个家系包括数量不等的个体。
+
+从下图中可以看出，每个群体内的不同家系间是存在差异的。如果我们分析时不考虑群体内的家系结构，那么本该属于残差的部分，往往会被累加到家系方差，结果是残差被低估，本来两个群体的性能可能并不显著，统计检验却表现为显著。
+
+```{r}
+ggplot(data=shrimp,aes(x=PopID,y=M2BW,fill=FamilyID)) + 
+  geom_boxplot(outlier.size = 0)+
+  labs(x="群体",y="收获体重")+
+  theme_gray(base_size = 20)+
+  theme(legend.position = "none")
+```
+
+根据教程1对于固定效应和随机效应的讨论，由于我们的目的是要分析四个群体间的差异，因此群体更适合做固定效应。每个群体是由多个家系组成的，这些家系只是大量家系的一个随机抽样，因此更加适合作为随机效应。
+
+
+
+<a id="8">模型8</a>
+
+$$M2BW = Pop + Sex + Tank + Sex:M1BW$$
+
+<a id="9">模型9</a>
+
+$$M2BW = Pop + Sex + Tank + Sex:M1BW + Pop:Family$$
+
+
+上述模型中，Pop:Family是随机效应。
+
+在模型中加入随机效应，需要使用lme4包中的lmer函数。
+
+```{r lm.8.9}
+shrimp.lm.8 <- lm(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW,shrimp)
+summary(shrimp.lm.8)
+shrimp.lm.9 <- lmer(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW + (1|PopID:FamilyID),shrimp)
+summary(shrimp.lm.9)
+```
