@@ -21,11 +21,11 @@ require(sjPlot)
 
 ### 4.4 包括随机效应的线性混合效应模型
 
-shrimp数据集中有一个PopID字段，包括Pop1到Pop4共计4个水平，表示shrimp数据由四个群体组成。现在考虑这样一个问题：四个群体间收获体重是否存在差异。
+请加载一个新的数据集shrimpex.csv,其中有一个PopID字段，包括Pop1到Pop4共计4个水平，表示shrimp数据由四个群体组成。现在考虑这样一个问题：四个群体间收获体重是否存在差异。
 
 首先加载数据文件。画出四个群体收获体重的箱形图，加上jitter点。
 ```{r}
-shrimp <- fread(input = "shrimp.csv",sep = ",",header = TRUE,stringsAsFactors = TRUE)
+shrimp <- fread(input = "shrimpex.csv",sep = ",",header = TRUE,stringsAsFactors = TRUE)
 str(shrimp)
 
 ggplot(data=shrimp,aes(x=PopID,y=M2BW,color=PopID)) + 
@@ -36,21 +36,23 @@ ggplot(data=shrimp,aes(x=PopID,y=M2BW,color=PopID)) +
   theme(legend.position = "none")
 ```
 
-进一步分析，你会发现每个群体由多个家系组成。这里需要重点讨论一个问题，为什么我们在评价群体间的差异时，需要考虑每个群体内的家系结构？
+从上图中，大致可以看出，群体间是存在差异的。
+
+进一步分析数据，你会发现每个群体由多个家系组成。这里遇到了一个问题，在评价群体间的差异时，是否需要考虑每个群体内的家系结构？
 
 理论上，我们从每个群体抽样时，抽样个体是代表该群体的随机样本。但是，一个群体内的个体往往存在亲缘关系，譬如（全同胞、半同胞个体）。因此抽样个体存在两个层次：每个群体包括多个家系，每个家系包括数量不等的个体。
 
-从下图中可以看出，每个群体内的不同家系间是存在差异的。如果我们分析时不考虑群体内的家系结构，那么本该属于残差的部分，往往会被累加到家系方差，结果是残差被低估，本来两个群体的性能可能并不显著，统计检验却表现为显著。
-
+从下图中可以看出，每个群体内的不同家系间是存在差异的。
 ```{r}
 ggplot(data=shrimp,aes(x=PopID,y=M2BW,fill=FamilyID)) + 
   geom_boxplot(outlier.size = 0)+
   labs(x="群体",y="收获体重")+
   theme_gray(base_size = 20)+
   theme(legend.position = "none")
+
 ```
 
-根据教程1对于固定效应和随机效应的讨论，由于我们的目的是要分析四个群体间的差异，因此群体更适合做固定效应。每个群体是由多个家系组成的，这些家系只是大量家系的一个随机抽样，因此更加适合作为随机效应。
+如上图所示，如果我们分析时不考虑群体内的家系结构，那么家系方差会被累加到残差方差中，导致残差方差值被高估。
 
 
 
@@ -58,18 +60,56 @@ ggplot(data=shrimp,aes(x=PopID,y=M2BW,fill=FamilyID)) +
 
 $$M2BW = Pop + Sex + Tank + Sex:M1BW$$
 
+[模型8](#8)不考虑家系结构，Pop、Sex和Tank为固定效应，Sex:M1BW为协变量。
+
 <a id="9">模型9</a>
 
 $$M2BW = Pop + Sex + Tank + Sex:M1BW + Pop:Family$$
 
+[模型9](#9)考虑家系结构，Pop:Family为随机效应，Pop、Sex和Tank为固定效应，Sex:M1BW为协变量。
 
-上述模型中，Pop:Family是随机效应。
+
+
+
+[模型8](#8)的分析结果
+
+```{r lm.8}
+shrimp.lm.8 <- lm(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW,shrimp)
+summary(shrimp.lm.8)
+```
 
 在模型中加入随机效应，需要使用lme4包中的lmer函数。
 
-```{r lm.8.9}
-shrimp.lm.8 <- lm(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW,shrimp)
-summary(shrimp.lm.8)
-shrimp.lm.9 <- lmer(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW + (1|PopID:FamilyID),shrimp)
+[模型9](#9)的分析结果
+
+```{r lm.9}
+shrimp.lm.9 <- lmer(M2BW ~ 1 + PopID + SexID + TankID + SexID:M1BW  + (1|PopID:FamilyID),shrimp)
 summary(shrimp.lm.9)
 ```
+
+把[模型8](#8)的Residual standard error的平方，与[模型9](#9) Random Effects部分对比，你会发现，如果不考虑家系结构，残差方差明显被高估,估计值为`r summary(shrimp.lm.8)$sigma^2` 。考虑家系结构后，残差方差为`r summary(shrimp.lm.9)$sigma^2`, 明显变小， 从残差中分离出了大部分的家系方差。
+
+### 4.5 获得每个群体的性能
+
+根据教程1对于固定效应和随机效应的讨论，由于我们的目的是要分析四个群体间的差异，获得每个群体的性能，因此群体更适合做固定效应。每个群体是由多个家系组成的，这些家系只是大量家系的一个随机抽样，因此更加适合作为随机效应。
+
+对于模型9，把Pop转换为固定效应，重新进行分析：
+```{r lm.10}
+shrimp.lm.10 <- lmer(M2BW ~ 1 + PopID +SexID + TankID + SexID:M1BW + (1|PopID:FamilyID),shrimp)
+summary(shrimp.lm.10)
+```
+
+然后，调用emmeans包中的函数，计算四个群体的估计边际均值(estimated marginal means)，或者说最小二乘均值(least-squares means)。根据边际均值，我们可以对群体的性能进行排序和比较。
+
+关于emmeans包，请参考日志[最小二乘均值的估计模型](https://luansheng.github.io/2017/06/10/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E5%9D%87%E5%80%BC%E7%9A%84%E4%BC%B0%E8%AE%A1%E6%A8%A1%E5%9E%8B/)。尽管该日志介绍的是lsmeans，但用法跟emmeans包都是一样的。而且根据作者介绍，在将来，emmeans包要替代lsmeans包。
+
+注意，安装emmeans还需要pbkrtest包，这个包没有自动安装，需要手动安装。
+
+```{r emmeans}
+require(emmeans)
+shrimp.lm10.rgl <- ref_grid(shrimp.lm.10)
+emmeans(shrimp.lm10.rgl,"PopID")
+
+```
+
+从上边结果中，可以看到Pop1群体的性能最好。
